@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/misaelmodesto/simple-crud-go/model"
 	"github.com/misaelmodesto/simple-crud-go/usecase"
 )
 
@@ -25,4 +26,23 @@ func (p *productController) GetProducts(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, products)
+}
+
+func (p *productController) CreateProduct(ctx *gin.Context) {
+
+	var product model.Product
+	err := ctx.BindJSON(&product)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	insertedProduct, err := p.productUseCase.CreateProduct(product)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, insertedProduct)
 }
